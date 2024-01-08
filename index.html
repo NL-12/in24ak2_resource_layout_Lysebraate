@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="ressurser.js"></script> 
+    <title>Ressursarkiv</title>
+</head>
+<body id="grid-container">
+    <header>
+        <h1>RESSURSARKIV</h1>
+    </header>
+    <main>
+        <ul id="tabs"></ul>
+        <article id="content"></article>
+    </main>
+
+    <script>
+        let activeTab = "HTML"
+
+        function BuildTabInformation() {
+            content = document.getElementById("content")
+            content.textContent = ""
+            let node = document.createElement("div")
+            node.setAttribute("id", "content-inner")
+            let tabData = resources.filter((data) => TrimString(data.category) == activeTab)[0]
+            let tabResources = "<ul>"
+            tabData.sources.map(resource => {
+                tabResources += `<li><a href="${resource.url}" target="_blank">${resource.title}</a></li>`
+            })
+            tabResources += "</ul>"
+            node.innerHTML = `<h2>${tabData.category}</h2>
+                <p>${tabData.text}</p>
+                ${tabResources}`
+            content.appendChild(node)
+        }
+
+        function BuildTabHeader() {
+            header = document.getElementById("tabs")
+            resources.map(resource => {
+                let node = document.createElement("li")
+                node.innerHTML = `<h2>${resource.category}</h2>`
+                node.classList.add("tab-inactive")
+                node.setAttribute("id", TrimString(resource.category))
+                header.appendChild(node)
+            })
+        }
+
+        function MakeTabActive() {
+            resources.map(resource => {
+                let tabID = TrimString(resource.category)
+                let tabElement = document.getElementById(tabID)
+                if (tabID == activeTab) {
+                    tabElement.classList.remove("tab-inactive")
+                    tabElement.classList.add("tab-active")
+                } else if (tabID !== activeTab && tabElement.classList.contains("tab-active")) {
+                    tabElement.classList.add("tab-inactive")
+                    tabElement.classList.remove("tab-active")
+                }
+            })
+        }
+
+        function InitializeEventListeners() {
+            resources.map(resource => {
+                let tabID = TrimString(resource.category)
+                let tabElement = document.getElementById(tabID)
+                tabElement.addEventListener("click",
+                    function(event) {
+                        SwitchTab(tabID)
+                    }
+                )
+            })
+        }
+
+        function TrimString(string) {
+            // https://stackoverflow.com/a/6623263
+            return (string.replace(/ /g,''))
+        }
+
+        function SwitchTab(tabID) {
+            activeTab = tabID
+            BuildTabInformation()
+            MakeTabActive()
+        }
+
+        BuildTabInformation()
+        BuildTabHeader()
+        MakeTabActive()
+        InitializeEventListeners()
+
+
+    </script>
+
+</body>
+</html>
