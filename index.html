@@ -9,36 +9,34 @@
     <title>Ressursarkiv</title>
 </head>
 <body id="grid-container">
-    <header>
-        <h1>RESSURSARKIV</h1>
-    </header>
-    <main>
-        <ul id="tabs"></ul>
-        <article id="content"></article>
+    <main id="flex-center">
+        <section>
+            <nav><ul id="tabs"></ul></nav>
+            <article id="content"></article>
+        </section>
     </main>
 
     <script>
         let activeTab = "HTML"
 
         function BuildTabInformation() {
-            content = document.getElementById("content")
+            let content = document.getElementById("content")
             content.textContent = ""
-            let node = document.createElement("div")
-            node.setAttribute("id", "content-inner")
+            let tabInformation = ""
             let tabData = resources.filter((data) => TrimString(data.category) == activeTab)[0]
             let tabResources = "<ul>"
             tabData.sources.map(resource => {
                 tabResources += `<li><a href="${resource.url}" target="_blank">${resource.title}</a></li>`
             })
             tabResources += "</ul>"
-            node.innerHTML = `<h2>${tabData.category}</h2>
+            tabInformation += `<h2>${tabData.category}</h2>
                 <p>${tabData.text}</p>
                 ${tabResources}`
-            content.appendChild(node)
+            content.innerHTML = tabInformation
         }
 
         function BuildTabHeader() {
-            header = document.getElementById("tabs")
+            let header = document.getElementById("tabs")
             resources.map(resource => {
                 let node = document.createElement("li")
                 node.innerHTML = `<h2>${resource.category}</h2>`
