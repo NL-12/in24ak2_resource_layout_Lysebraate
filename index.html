@@ -5,91 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="normalize.css">
     <link rel="stylesheet" href="style.css">
+    <!-- Linje 9: Last in en ekstern JavaScript fil, denne inneholder alle dataen vi ønsker å bruke.  -->
     <script src="ressurser.js"></script> 
     <title>Ressursarkiv</title>
 </head>
+<!-- Linje 13: Sett opp en enkel grid (1x1). -->
 <body id="grid-container">
+    <!-- Linje 15: Set opp 'main' med en id ('flex-center') for å gjøre alt sentrert. -->
     <main id="flex-center">
+        <!-- Linje 17 til 22: Section-tag som er nødvendig for å sentrere alt inneholdet ved bruk av flex. -->
         <section>
+            <!-- Linje 19: Et element som skal holde alle våre tabs. -->
             <nav><ul id="tabs"></ul></nav>
+            <!-- Linje 21: Et element som vi skal skrive all informasjonen om den "åpne" tab-en til. -->
             <article id="content"></article>
         </section>
     </main>
 
     <script>
+        // Linje 27: Global streng for å "huske" hvilken tab vi har "åpen".
         let activeTab = "HTML"
 
-        function BuildTabInformation() {
+        // Linje 30 til 54: Funksjon for å gjøre om dataen vi laster inn fra ressurser til gjeldende informasjon som skal vises når vi trykker på en gitt 'tab'.
+        function buildTabInformation() {
+            // Linje 32: Midlertidig / lokal variabel som peker til 'article'-taggen med ID content hvor vi skal 'skrive ut' informasjonen.
             let content = document.getElementById("content")
+            // Linje 34: Sørg for at vår 'article'-tag er tom.
             content.textContent = ""
+            // Linje 36: Enda en midlertidig / lokal variabel. Dette er en string som vi skal bygge ut med HTML-koden for nettsiden.
             let tabInformation = ""
-            let tabData = resources.filter((data) => TrimString(data.category) == activeTab)[0]
+            // Linje 38: Gå gjennom resources som vi laster tidligere. Bruk filter metoden for å hente all data som samsvarer med vår aktive "tab". Altså hvis stringen 'activeTab' er lik 'data.category'
+            let tabData = resources.filter((data) => trimString(data.category) == activeTab)[0]
+            // Linje 40: Enda en midlertidig / lokal variabel. Denne holder strengen med HTML-kode for vår liste av lenker. For effektivitet deklarer vi den med begynnelsen av vår liste (ul).
             let tabResources = "<ul>"
+            // Linje 42 til 45: Gå gjennom hvert punkt i arrayen 'tabData.sources' for å hente informasjonen om lenkene vi ønsker å "skrive ut".
             tabData.sources.map(resource => {
+                // Linje 44: Bygg på 'tabResources' stringen med en template literal. Hent 'url' og 'title' verdien vi ønsker fra den nøstede arrayen innefor 'resource'. Disse skal være lenker innenfor liste elementer. 
                 tabResources += `<li><a href="${resource.url}" target="_blank">${resource.title}</a></li>`
             })
+            // Linje 47: Avslutt list taggen vår.
             tabResources += "</ul>"
+            // Linje 49 til 51: Samle kategorien ('category'), beskrivelsen ('text') og den ferdige HTML-koden for listen ('tabResources') i en template literal.
             tabInformation += `<h2>${tabData.category}</h2>
-                <p>${tabData.text}</p>
-                ${tabResources}`
+                                <p>${tabData.text}</p>
+                                ${tabResources}`
+            // Linje 53: Sett den indre HTML-en til 'content' til å være strengen 'tabInformation'. Så HTML-koden vi nettopp bygget ferdig.
             content.innerHTML = tabInformation
         }
 
-        function BuildTabHeader() {
-            let header = document.getElementById("tabs")
+        // Linje 57 til 70:  Funksjon for å lage hver 'tab' som vi kan trykke på for å få opp forskjellig informasjon.
+        function buildTabHeader() {
+            // Linje 59: Set opp en "peker" mot listen (ul) med ID tabs.
+            let tabs = document.getElementById("tabs")
+            // Linje 61 til 69: Bruk metoden 'maps' for å kjøre gjennom alle elementer i 'resources'.
             resources.map(resource => {
+                // Linje 63: Lag en ny node i DOM-et til nettsiden. Denne skal være et 'li' element (liste-punkt).
                 let node = document.createElement("li")
+                // Linje 65 til 68: Først lag en 'h2'-tag innenfor 'li'-taggen med kategori navnet ('resource.category') fra 'resources'. Deretter gi dette elementet klassen 'tab-inactive' som standard. Så får den en ID som tilsvarer kategorien uten mellomrom. Og til slutt legges denne noden til HTML-elementet (listen) 'tabs' med metoden 'appendChild'.
                 node.innerHTML = `<h2>${resource.category}</h2>`
                 node.classList.add("tab-inactive")
-                node.setAttribute("id", TrimString(resource.category))
-                header.appendChild(node)
+                node.setAttribute("id", trimString(resource.category))
+                tabs.appendChild(node)
             })
         }
 
-        function MakeTabActive() {
+        // Linje 73 til 92: Funksjon som undersøker hvilken tab vi har "åpen" og tildeler denne en tilsvarende klasse for å synliggjøre det.
+        function makeTabActive() {
+            // Linje 75 til 91: Gå gjennom hvert element i 'resources'. 
             resources.map(resource => {
-                let tabID = TrimString(resource.category)
+                // Linje 77: Få takk i element sin ID.
+                let tabID = trimString(resource.category)
+                // Linje 79: Sett opp en "peker" mot denne 'tab'-en, altså et 'li' element innenfor 'tabs'.
                 let tabElement = document.getElementById(tabID)
+                // Linje 81 til 86: Hvis strengen 'tabID' er lik strengen 'activeTab' er dette tab-en vi har "åpen".
                 if (tabID == activeTab) {
+                    // Linje 83 til 84: Gi denne tab-en klassen for å være aktive 'tab-active' og fjern den motsatte klassen 'tab-inactive'.
                     tabElement.classList.remove("tab-inactive")
                     tabElement.classList.add("tab-active")
+                // Linke 86 til 90: Men hvis 'tabID' ikke er lik 'activeTab' og denne tab-en har klassen 'tab-active' skal denne klassen fjernes.
                 } else if (tabID !== activeTab && tabElement.classList.contains("tab-active")) {
+                    // Linje 88 til 89: Fjern 'tab-active' fra elementet og gi den 'tab-inactive' klassen.
                     tabElement.classList.add("tab-inactive")
                     tabElement.classList.remove("tab-active")
                 }
             })
         }
 
-        function InitializeEventListeners() {
+        // Linje 95 til 110: Funksjon for å tildele hver tab (li-element) en event listener som skal gjøre den 'aktive'.
+        function initializeEventListeners() {
+            // Linje 97 til 109: Gå gjennom alle elementer i resources.
             resources.map(resource => {
-                let tabID = TrimString(resource.category)
+                // Linje 99: Finn ID-en til denne ressursen.
+                let tabID = trimString(resource.category)
+                // Linje 101: Sett opp en "peker" mot denne ID-en sitt element.
                 let tabElement = document.getElementById(tabID)
+                // Linje 103 til 108: Kjør 'addEventListener' metoden på element. Denne skal "hende" når vi trykker på en tab.
                 tabElement.addEventListener("click",
                     function(event) {
-                        SwitchTab(tabID)
+                        // Linje 106: I denne anonyme funksjonen ønsker vi å kalle 'switchTab' med den gjeldende tab sin ID.
+                        switchTab(tabID)
                     }
                 )
             })
         }
 
-        function TrimString(string) {
-            // https://stackoverflow.com/a/6623263
+        // Linje 113 til 116: Hjelpe funksjon som tar imot en string og returnere den uten mellomrom.
+        function trimString(string) {
+            // Linje 115: Regex utrykk hentet fra her: https://stackoverflow.com/a/6623263. Deretter send tilbake den nye stringen.
             return (string.replace(/ /g,''))
         }
 
-        function SwitchTab(tabID) {
+        // Linje 119 til 125: Funksjon som forandrer den globale stringen 'activeTab' til en ny string vi sender inn, hvilket tilsvarer tab-en som er "åpen".
+        function switchTab(tabID) {
+            // Linje 121: Set 'activeTab' til en ny verdi.
             activeTab = tabID
-            BuildTabInformation()
-            MakeTabActive()
+            // Linje 123 til 124: Kjør funksjonen 'buildTabInformation' for å "skrive ut" informasjonen til den "åpne" tab-en. Deretter funksjonen 'makeTabActive' for å gi den "åpne" tab-en riktig klasse.
+            buildTabInformation()
+            makeTabActive()
         }
 
-        BuildTabInformation()
-        BuildTabHeader()
-        MakeTabActive()
-        InitializeEventListeners()
-
-
+        // Linje 128 til 131: Kjør disse funksjonene når vi laster siden. Hent informasjonen fra den "åpne" tab-en. Så lag selve tab-ene. Og gi de riktig klasse. Til slutt "sett på" event listeners for dem.
+        buildTabInformation()
+        buildTabHeader()
+        makeTabActive()
+        initializeEventListeners()
     </script>
-
 </body>
 </html>
